@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 
 // Import Material UI
 import {
@@ -41,9 +41,9 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(3),
   },
   list: {
-    minWidth: theme.spacing(10),
-    maxWidth: 178
-  }
+    // minWidth: theme.spacing(10),
+    // maxWidth: 178,
+  },
 }));
 
 const MenuFeatures = () => {
@@ -57,7 +57,7 @@ const MenuFeatures = () => {
   const buttonsFeature = [
     {
       type: (
-        <ListItem button className={classes.nested}>
+        <ListItem button className={classes.nested} key="CreateMenu">
           <ListItemIcon>
             <CreateIcon />
           </ListItemIcon>
@@ -68,7 +68,7 @@ const MenuFeatures = () => {
     },
     {
       type: (
-        <ListItem button className={classes.nested}>
+        <ListItem button className={classes.nested} key="EditMenu">
           <ListItemIcon>
             <EditIcon />
           </ListItemIcon>
@@ -83,11 +83,7 @@ const MenuFeatures = () => {
     {
       title: <LayersIcon color="primary" />,
       name: 'Open Layers',
-      content: (
-        <div className={classes.layerPaper}>
-          {/* <LayerPaper /> */}
-        </div>
-      ),
+      content: <div className={classes.layerPaper}>{/* <LayerPaper /> */}</div>,
     },
     {
       title: <GestureIcon color="primary" />,
@@ -100,7 +96,7 @@ const MenuFeatures = () => {
     <>
       <List className={classes.list}>
         {actions.map((action) => (action.name === 'Features' ? (
-          <>
+          <Fragment key={action.name}>
             <ListItem button onClick={handleClick}>
               <ListItemIcon>{action.title}</ListItemIcon>
               <ListItemText primary={action.name} />
@@ -111,15 +107,15 @@ const MenuFeatures = () => {
                 {action.content}
               </List>
             </Collapse>
-          </>
+          </Fragment>
         ) : (
-          <>
-            <ListItem>
+          <Fragment key={action.name}>
+            <ListItem button>
               <ListItemIcon>{action.title}</ListItemIcon>
               <ListItemText primary={action.name} />
             </ListItem>
             {action.content}
-          </>
+          </Fragment>
         )))}
       </List>
     </>

@@ -9,6 +9,7 @@ const mapStateToProps = (state) => ({
   layersActive: state.layerReducer.layers,
   coordinates: state.layerReducer.coordinates,
   properties: state.layerReducer.properties,
+  newColor: state.layerReducer.importedLayers,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -16,14 +17,14 @@ const mapDispatchToProps = (dispatch) => ({
     // console.log('containers', features);
     dispatch(saveFeatures(features));
   },
-  handleLayers: (layerName, layerExtent) => {
-    dispatch(saveLayers(layerName, layerExtent));
+  handleLayers: (layerName, layerExtent, color) => {
+    dispatch(saveLayers(layerName, layerExtent, color));
   },
   handleProperties: (properties, coordinates) => {
     dispatch(saveProperties(properties, coordinates));
   },
-  handleImportedLayers: (layerName, layerExtent) => {
-    dispatch(saveImportedLayers(layerName, layerExtent));
+  handleImportedLayers: (layerName, layerExtent, color) => {
+    dispatch(saveImportedLayers(layerName, layerExtent, color));
   },
 });
 

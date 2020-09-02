@@ -1,28 +1,11 @@
 // == Import yarn
-import React, {
-  useState,
-  useEffect,
-} from 'react';
+import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
+import { Map, View, Overlay } from 'ol';
+import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
+import { OSM, Vector as VectorSource } from 'ol/source';
 import {
-  Map,
-  View,
-  Overlay,
-} from 'ol';
-import {
-  Tile as TileLayer,
-  Vector as VectorLayer,
-} from 'ol/layer';
-import {
-  OSM,
-  Vector as VectorSource,
-} from 'ol/source';
-import {
-  Circle as CircleStyle,
-  Fill,
-  Stroke,
-  Style,
-  Icon,
+  Circle as CircleStyle, Fill, Stroke, Style, Icon,
 } from 'ol/style';
 import {
   Draw,
@@ -33,13 +16,10 @@ import {
   DragAndDrop,
   defaults as defaultInteractions,
 } from 'ol/interaction';
-import {
-  platformModifierKeyOnly,
-} from 'ol/events/condition';
-import {
-  GeoJSON,
-} from 'ol/format';
+import { platformModifierKeyOnly } from 'ol/events/condition';
+import { GeoJSON } from 'ol/format';
 import * as olControl from 'ol/control';
+import WebGLPointsLayer from 'ol/layer/WebGLPoints';
 
 // Import Material UI
 import {
@@ -64,11 +44,7 @@ import {
   ChevronRight as ChevronRightIcon,
   InsertDriveFileOutlined as InsertDriveFileOutlinedIcon,
 } from '@material-ui/icons';
-import {
-  makeStyles,
-  useTheme,
-} from '@material-ui/core/styles';
-
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 // == Import component
 import Menu from '../Menu';
@@ -141,7 +117,6 @@ const useStyles = makeStyles((theme) => ({
   insertDriveIcon: {
     margin: '0.5em auto',
     cursor: 'pointer',
-
   },
   olPopup: {
     position: 'absolute',
@@ -164,9 +139,9 @@ const Illion = ({
   handleProperties,
   layersActive,
   handleImportedLayers,
+  newColor,
 }) => {
   const classes = useStyles();
-
   const [top, setTop] = React.useState(0);
   const [left, setLeft] = React.useState(0);
   const [edit, setEdit] = React.useState(false);
@@ -175,12 +150,12 @@ const Illion = ({
   const [open, setOpen] = React.useState(false);
   const [center, setCenter] = useState([300000, 5900000]);
   const [zoom, setZoom] = useState(6.6);
-  const [extent, setExtent] = useState(
-    [-1249198.2873332978,
-      5142345.212601059,
-      1849198.2873332978,
-      6657654.787398941],
-  );
+  const [extent, setExtent] = useState([
+    -1249198.2873332978,
+    5142345.212601059,
+    1849198.2873332978,
+    6657654.787398941,
+  ]);
 
   let draw;
   let snap;
@@ -195,6 +170,19 @@ const Illion = ({
   };
   const color = getRandomColor();
   const randColor = (col) => col === color && getRandomColor();
+
+  const predefinedStyles = {
+    icons: {
+      symbol: {
+        symbolType: 'image',
+        src: 'data/icon.png',
+        size: [18, 28],
+        color: 'lightyellow',
+        rotateWithView: false,
+        offset: [0, 9],
+      },
+    },
+  };
 
   const dragAndDropInteraction = new DragAndDrop({
     formatConstructors: [GeoJSON],
@@ -228,8 +216,6 @@ const Illion = ({
       }),
     }),
   });
-
-  
 
   const overlay = new Overlay({
     element: null,
@@ -265,11 +251,12 @@ const Illion = ({
   const select = new Select();
   const selectedFeatures = select.getFeatures();
 
+  // Cible la div map apres rendu
   useEffect(() => {
     map.setTarget('map');
   }, []);
 
-
+  // Instancie GeoJSON apres rendu
   useEffect(() => {
     const firstSource = new VectorSource({
       features: new GeoJSON().readFeatures(data),
@@ -293,15 +280,17 @@ const Illion = ({
         }),
       }),
     });
-    map.addLayer(firstVector)
+    map.addLayer(firstVector);
     handleLayers(vector.get('name'));
-  }, [])
+  }, []);
 
+  const [vectorSource] = useState(
+    new VectorSource(),
+  );
+  // Instancie DragAndDrop
   useEffect(() => {
     dragAndDropInteraction.on('addfeatures', (event) => {
-      const vectorSource = new VectorSource({
-        features: event.features,
-      });
+      vectorSource.addFeatures(event.features);
       const indexOfExtention = event.file.name.length - 8;
       const splitFileName = event.file.name.split('');
       const removeExtention = splitFileName.slice(0, indexOfExtention);
@@ -337,7 +326,7 @@ const Illion = ({
       map.getView().fit(vectorSource.getExtent());
     });
   }, []);
-
+  // Instancie overlay
   useEffect(() => {
     overlay.setElement(document.getElementById('popup'));
     map.on('click', (evt) => {
@@ -357,6 +346,7 @@ const Illion = ({
     });
   }, []);
 
+  // Instancie dragBox
   useEffect(() => {
     map.addInteraction(select);
     map.addInteraction(dragBox);
@@ -434,7 +424,24 @@ const Illion = ({
       }
 
       if (event.data[0] === 'deleteAllFeatures') {
-        selectedFeatures.forEach((feature) => drawSource.removeFeature(feature));
+        // selectedFeatures.forEach((feature) => drawSource.removeFeature(feature));
+        // selectedFeatures.forEach((feature) => console.log(feature));
+        console.log(selectedFeatures);
+        map
+          .getLayers()
+          .forEach((layer) => {
+            const source = layer.getSource();
+            if (layer instanceof TileLayer) {
+              // eslint-disable-next-line no-useless-return
+              return;
+            }
+
+            source.getFeatures().forEach((feature) => {
+              if (selectedFeatures.getArray().includes(feature)) {
+                source.removeFeature(feature);
+              }
+            });
+          });
       }
 
       if (event.data[0] === 'edit') {
@@ -452,8 +459,53 @@ const Illion = ({
             (layer) => layer.get('name') === event.data[1] && map.removeLayer(layer),
           );
       }
+      if (event.data[0] === 'showLayer') {
+        console.log(event.data[1]);
+        map.getView().fit(map.getExtent(event.data[1]));
+      }
+      if (event.data[0] === 'changeColor' && newColor[0].color !== undefined) {
+        map
+          .getLayers()
+          .forEach(
+            (layer) => {
+              if (layer.get('name') === event.data[1]) {
+              // console.log(layer.getStyle().getFill().setColor());
+              // console.log(layer.getStyle().getStroke().setColor());
+              // console.log(layer.getStyle().getFill().setColor(event.data[2]));
+                layer.getStyle().getFill().setColor(event.data[2]);
+                layer.getStyle().getStroke().setColor(event.data[2]);
+                layer.changed();
+              }
+            },
+          );
+      }
     };
   }, []);
+
+  // useEffect(() => {
+  //   window.onmessage = (event) => {
+  //     if (event.data[0] === 'showLayer') {
+  //       console.log('oui');
+  //       map.getView().fit(map.getExtent(event.data[1]));
+  //     }
+  //     if (event.data[0] === 'changeColor' && newColor[0].color !== undefined) {
+  //       map
+  //         .getLayers()
+  //         .forEach(
+  //           (layer) => {
+  //             if (layer.get('name') === event.data[1]) {
+  //             // console.log(layer.getStyle().getFill().setColor());
+  //             // console.log(layer.getStyle().getStroke().setColor());
+  //             // console.log(layer.getStyle().getFill().setColor(event.data[2]));
+  //               layer.getStyle().getFill().setColor(event.data[2]);
+  //               layer.getStyle().getStroke().setColor(event.data[2]);
+  //               layer.changed();
+  //             }
+  //           },
+  //         );
+  //     }
+  //   };
+  // }, []);
 
   // console.log(map.getInteractions().getArray());
   return (
@@ -498,30 +550,32 @@ const Illion = ({
         >
           <div className={classes.toolbar}>
             <IconButton onClick={() => setOpen(false)}>
-              {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+              {theme.direction === 'rtl' ? (
+                <ChevronRightIcon />
+              ) : (
+                <ChevronLeftIcon />
+              )}
             </IconButton>
           </div>
           <Divider />
-          {open
-            ? (
-              <List>
-                <ListItem>
-                  <Menu />
-                </ListItem>
-              </List>
-            )
-            : ''}
+          {open ? (
+            // <List>
+            //   <ListItem>
+            <Menu />
+          ) : (
+            //   </ListItem>
+            // </List>
+            ''
+          )}
         </Drawer>
       </div>
 
       <div
         id="map"
-        style={
-      {
-        width: '100%',
-        height: '100vh',
-      }
-    }
+        style={{
+          width: '100%',
+          height: '100vh',
+        }}
       />
       <div
         id="popup"

@@ -5,22 +5,24 @@ import {
 } from '../actions/saveLayersAction';
 import {
   DELETE_LAYER,
-  DELETE_IMPORTED_LAYER
+  DELETE_IMPORTED_LAYER,
 } from '../actions/deleteLayerAction';
 
+import { CHANGE_COLOR } from '../actions/colorAction';
 
 export const initialState = {
   layers: [],
   importedLayers: [],
   properties: {},
   coordinates: [],
+  color: {},
 };
 
 const LayerReducer = (state = initialState, action = {}) => {
   switch (action.type) {
     case SAVE_LAYERS: {
       const layerInState = state.layers;
-      const newLayer = { name: action.layerName, extent: action.layerExtent };
+      const newLayer = { name: action.layerName, extent: action.layerExtent, color: action.color };
       layerInState.push(newLayer);
       return {
         ...state,
@@ -29,7 +31,7 @@ const LayerReducer = (state = initialState, action = {}) => {
     }
     case SAVE_IMPORTED_LAYERS: {
       const layerInState = state.importedLayers;
-      const newLayer = { name: action.layerName, extent: action.layerExtent };
+      const newLayer = { name: action.layerName, extent: action.layerExtent, color: action.color };
       layerInState.push(newLayer);
       return {
         ...state,
@@ -66,6 +68,19 @@ const LayerReducer = (state = initialState, action = {}) => {
         properties: [action.properties],
         coordinates: [action.coordinates],
       };
+    case CHANGE_COLOR: {
+      const { importedLayers } = state;
+      importedLayers.map((layer) => {
+        if (layer.name === action.name) {
+          layer.color = action.hex;
+        }
+      });
+
+      return {
+        ...state,
+        importedLayers: [...importedLayers],
+      };
+    }
     default:
       return state;
   }

@@ -62,7 +62,7 @@ const App = ({
           <DeleteForeverIcon
             className={classes.trash}
             onClick={() => {
-              window.postMessage(['deleteAllFeatures']);
+              window.postMessage(['deleteAllFeatures', featuresSelected]);
               deleteAllFeatures();
             }}
           />

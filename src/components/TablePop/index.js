@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -52,10 +52,10 @@ const TablePop = ({ properties }) => {
           {keyProperties.map((key) => (
 
             properties.length && properties.map((row) => (
-              <>
+              <Fragment key={row.ID_PROPRIE}>
                 {row[key] !== null
                   ? (
-                    <TableRow key={row.ID_PROPRIE}>
+                    <TableRow>
                       <TableCell component="th" scope="row">
                         {key}
                       </TableCell>
@@ -65,7 +65,7 @@ const TablePop = ({ properties }) => {
                     </TableRow>
                   )
                   : console.log('noop')}
-              </>
+              </Fragment>
             ))))}
 
         </TableBody>

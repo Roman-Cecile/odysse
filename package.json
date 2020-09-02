@@ -54,6 +54,7 @@
     "ol": "^6.4.3",
     "prop-types": "*",
     "react": "*",
+    "react-color": "^2.18.1",
     "react-dom": "*",
     "react-redux": "^7.2.1",
     "react-router-dom": "^5.2.0",
