@@ -48,7 +48,6 @@ const App = ({
   importedLayer,
 }) => {
   const classes = useStyles();
-  console.log(featuresSelected);
   
   return (
     <>
