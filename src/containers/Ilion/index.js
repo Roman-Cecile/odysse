@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 
 import { saveFeatures } from '../../actions/selectFeatureAction';
 import { saveLayers, saveProperties, saveImportedLayers } from '../../actions/saveLayersAction';
-import Illion from '../../components/Illion';
+import ilion from '../../components/Ilion';
 
 const mapStateToProps = (state) => ({
   featuresTarget: state.featureReducer.features,
@@ -31,4 +31,4 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(Illion);
+)(ilion);

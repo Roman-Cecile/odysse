@@ -3,10 +3,10 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
   Clear as ClearIcon,
 } from '@material-ui/icons';
 import { TwitterPicker } from 'react-color';
-import { set } from 'ol/transform';
 
 const useStyles = makeStyles((theme) => ({
   liStyle: {
@@ -36,6 +36,11 @@ const useStyles = makeStyles((theme) => ({
     top: theme.spacing(3),
     right: theme.spacing(2),
   },
+  icons: {
+    width: theme.spacing(7),
+    display: 'flex',
+    justifyContent: 'space-between'
+  }
 }));
 
 const ImportedLayer = ({
@@ -45,6 +50,7 @@ const ImportedLayer = ({
 }) => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
+  const [isVisible, setIsvisible] = React.useState(true);
   const [targetColor, setTargetColor] = React.useState(null);
   const handleClick = (target) => {
     setTargetColor(target);
@@ -58,7 +64,7 @@ const ImportedLayer = ({
       <ul>
         {importedLayers
           ? importedLayers.map((layer) => (
-            <li className={classes.liStyle}>
+            <li className={classes.liStyle} key={layer.name}>
               <div className={classes.titleAndColor}>
                 <div
                   className={classes.color}
@@ -88,8 +94,28 @@ const ImportedLayer = ({
                   {layer.name}
                 </div>
               </div>
-              <div>
-                <VisibilityIcon style={{ cursor: 'pointer' }} />
+              <div className={classes.icons}>
+                {isVisible
+                  ? (
+                    <VisibilityIcon
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => {
+                        window.postMessage(['toggleVisible', layer]);
+                        setIsvisible(false);
+                      }}
+                    />
+
+                  )
+                  : (
+                    <VisibilityOffIcon
+                      style={{ cursor: 'pointer' }}
+                      color="disabled"
+                      onClick={() => {
+                        window.postMessage(['toggleVisible', layer]);
+                        setIsvisible(true);
+                      }}
+                    />
+                  )}
                 <ClearIcon
                   onClick={() => {
                     window.postMessage(['deleteLayer', layer.name]);

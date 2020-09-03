@@ -30,6 +30,7 @@ const useStyles = makeStyles((theme) => ({
 
   layerActive: {
     cursor: 'pointer',
+    marginRight: '1em',
   },
 }));
 
@@ -41,7 +42,7 @@ const LayerPaper = ({ layersActive, deleteLayer }) => {
     <Paper elevation={0}>
       {layersActive.length > 0
         ? layersActive.map((layer) => (
-          <li className={classes.paperLi}>
+          <li className={classes.paperLi} key={layer.name}>
             <span className={classes.layerActive} onClick={() => window.postMessage(['showLayer', layer.extent])}>
               {layer.name}
             </span>

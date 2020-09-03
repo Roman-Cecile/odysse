@@ -5,7 +5,7 @@ import { Map, View, Overlay } from 'ol';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { OSM, Vector as VectorSource } from 'ol/source';
 import {
-  Circle as CircleStyle, Fill, Stroke, Style, Icon,
+  Circle as CircleStyle, Fill, Stroke, Style,
 } from 'ol/style';
 import {
   Draw,
@@ -19,34 +19,26 @@ import {
 import { platformModifierKeyOnly } from 'ol/events/condition';
 import { GeoJSON } from 'ol/format';
 import * as olControl from 'ol/control';
-import WebGLPointsLayer from 'ol/layer/WebGLPoints';
 
 // Import Material UI
 import {
   Drawer,
   AppBar,
   Toolbar,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   IconButton,
   Typography,
   CssBaseline,
   Divider,
-  Fab,
-  Badge,
-  Container,
 } from '@material-ui/core';
 import {
   Menu as MenuIcon,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
-  InsertDriveFileOutlined as InsertDriveFileOutlinedIcon,
 } from '@material-ui/icons';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 // == Import component
+import { matchPath } from 'react-router-dom';
 import Menu from '../Menu';
 
 // Import data GEOJSON
@@ -136,7 +128,7 @@ const useStyles = makeStyles((theme) => ({
 
 // == Composant
 
-const Illion = ({
+const ilion = ({
   handleFeature,
   handleLayers,
   handleProperties,
@@ -145,8 +137,6 @@ const Illion = ({
   newColor,
 }) => {
   const classes = useStyles();
-  const [top, setTop] = React.useState(0);
-  const [left, setLeft] = React.useState(0);
   const [edit, setEdit] = React.useState(false);
   const [create, setCreate] = React.useState(false);
   const theme = useTheme();
@@ -159,6 +149,7 @@ const Illion = ({
     1849198.2873332978,
     6657654.787398941,
   ]);
+  const [visible] = useState(true);
 
   let draw;
   let snap;
@@ -249,7 +240,7 @@ const Illion = ({
   // instantiate GeoJSON
   const firstSource = new VectorSource();
   useEffect(() => {
-    firstSource.addFeatures(new GeoJSON().readFeatures(data),)
+    firstSource.addFeatures(new GeoJSON().readFeatures(data));
     const firstVector = new VectorLayer({
       source: firstSource,
       name: 'FT_Chambre',
@@ -322,10 +313,7 @@ const Illion = ({
       // console.log(map.getFeaturesAtPixel(evt.pixel).length);
       if (draw === undefined && map.getFeaturesAtPixel(evt.pixel).length) {
         const coordinate = map.getCoordinateFromPixel(evt.pixel);
-        const position = overlay;
-        console.log(position);
         overlay.setPosition(coordinate);
-        console.log(overlay.getPosition());
         const pixelFeatures = map.getFeaturesAtPixel(evt.pixel);
         handleProperties(pixelFeatures[0].getProperties());
       }
@@ -403,12 +391,15 @@ const Illion = ({
       }
 
       if (event.data[0] === 'deleteOneFeature') {
-        drawSource
-          .getFeatures()
-          .forEach(
-            (feature) => feature.get('name') === event.data[1]
-              && drawSource.removeFeature(feature),
-          );
+        map
+          .getLayers()
+          .forEach((layer) => {
+            const source = layer.getSource();
+            if (!isTileLayer(layer, TileLayer)) {
+              source.getFeatures().forEach((feature) => feature.get('name') === event.data[1]
+                  && source.removeFeature(feature));
+            }
+          });
       }
 
       if (event.data[0] === 'deleteAllFeatures') {
@@ -460,35 +451,21 @@ const Illion = ({
             },
           );
       }
+      if (event.data[0] === 'toggleVisible') {
+        map
+          .getLayers()
+          .forEach(
+            (layer) => {
+              if (layer.getVisible()) {
+                return layer.get('name') === event.data[1].name && layer.setVisible(false);
+              }
+              return layer.get('name') === event.data[1].name && layer.setVisible(true);
+            },
+          );
+      }
     };
   }, []);
 
-  // useEffect(() => {
-  //   window.onmessage = (event) => {
-  //     if (event.data[0] === 'showLayer') {
-  //       console.log('oui');
-  //       map.getView().fit(map.getExtent(event.data[1]));
-  //     }
-  //     if (event.data[0] === 'changeColor' && newColor[0].color !== undefined) {
-  //       map
-  //         .getLayers()
-  //         .forEach(
-  //           (layer) => {
-  //             if (layer.get('name') === event.data[1]) {
-  //             // console.log(layer.getStyle().getFill().setColor());
-  //             // console.log(layer.getStyle().getStroke().setColor());
-  //             // console.log(layer.getStyle().getFill().setColor(event.data[2]));
-  //               layer.getStyle().getFill().setColor(event.data[2]);
-  //               layer.getStyle().getStroke().setColor(event.data[2]);
-  //               layer.changed();
-  //             }
-  //           },
-  //         );
-  //     }
-  //   };
-  // }, []);
-
-  // console.log(map.getInteractions().getArray());
   return (
     <>
       <div className={classes.root}>
@@ -568,4 +545,4 @@ const Illion = ({
 };
 
 // == Export
-export default Illion;
+export default ilion;

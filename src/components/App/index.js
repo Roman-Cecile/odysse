@@ -10,7 +10,7 @@ import { Slide, Paper } from '@material-ui/core';
 
 // == Import
 import PaperImportedLayer from '../../containers/ImportedLayers';
-import Illion from '../../containers/Illion';
+import Ilion from '../../containers/Ilion';
 
 import './styles.scss';
 
@@ -21,10 +21,10 @@ const useStyles = makeStyles((theme) => ({
   },
   paperStyle: {
     position: 'fixed',
-    bottom: '10px',
-    right: '10px',
-    width: '15%',
-    zIndex: '20',
+    bottom: 10,
+    right: 10,
+    width: theme.spacing(30),
+    zIndex: 20,
     padding: '0.8em',
   },
   trash: {
@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
     left: '2000em',
   },
   paper: {
-    width: '15%',
+    width: theme.spacing(30),
     position: 'fixed',
     right: 15,
     top: 100,
@@ -91,7 +91,7 @@ const App = ({
         </Paper>
       </Slide>
 
-      <Illion />
+      <Ilion />
     </>
   );
 };

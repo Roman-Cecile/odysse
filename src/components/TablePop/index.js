@@ -64,7 +64,7 @@ const TablePop = ({ properties }) => {
                       </TableCell>
                     </TableRow>
                   )
-                  : console.log('noop')}
+                  : null}
               </Fragment>
             ))))}
 

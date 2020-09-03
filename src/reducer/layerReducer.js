@@ -16,6 +16,7 @@ export const initialState = {
   properties: {},
   coordinates: [],
   color: {},
+  visibility: true,
 };
 
 const LayerReducer = (state = initialState, action = {}) => {
@@ -52,7 +53,7 @@ const LayerReducer = (state = initialState, action = {}) => {
             importedLayers: [...importedLayers],
           };
         }
-      })
+      });
       return {
         ...state,
         layers: [...layers],
