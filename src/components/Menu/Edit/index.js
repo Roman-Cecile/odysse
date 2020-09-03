@@ -1,7 +1,14 @@
 import React from 'react';
-import { Button } from '@material-ui/core';
+import {
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from '@material-ui/core';
+import {
+  Create as EditIcon,
+} from '@material-ui/icons';
 
-const Edit = () => {
+const Edit = ({ classes }) => {
   const [isActive, setIsActive] = React.useState(true);
   window.addEventListener('keydown', (event) => {
     if (event.keyCode === 27) {
@@ -10,16 +17,22 @@ const Edit = () => {
   });
   return (
     <>
-      <Button
-        aria-controls="simple-menu"
-        aria-haspopup="true"
+      <ListItem
+        button
+        className={classes}
+        disabled={isActive}
         onClick={() => {
           window.postMessage(['edit']);
         }}
-        disabled={isActive}
       >
-        Editer
-      </Button>
+        <ListItemIcon>
+          <EditIcon />
+        </ListItemIcon>
+        <ListItemText
+          primary="Editer"
+
+        />
+      </ListItem>
     </>
   );
 };

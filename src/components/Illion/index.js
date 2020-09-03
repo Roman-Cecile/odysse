@@ -55,6 +55,9 @@ import data from '../../../public/FT_Chambre_3857.geojson';
 // Import container
 import TablePop from '../../containers/TablePop';
 
+// Import utile
+import isTileLayer from '../../utils/layerFilter';
+
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -171,19 +174,6 @@ const Illion = ({
   const color = getRandomColor();
   const randColor = (col) => col === color && getRandomColor();
 
-  const predefinedStyles = {
-    icons: {
-      symbol: {
-        symbolType: 'image',
-        src: 'data/icon.png',
-        size: [18, 28],
-        color: 'lightyellow',
-        rotateWithView: false,
-        offset: [0, 9],
-      },
-    },
-  };
-
   const dragAndDropInteraction = new DragAndDrop({
     formatConstructors: [GeoJSON],
   });
@@ -251,16 +241,15 @@ const Illion = ({
   const select = new Select();
   const selectedFeatures = select.getFeatures();
 
-  // Cible la div map apres rendu
+  // Target div map after loading
   useEffect(() => {
     map.setTarget('map');
   }, []);
 
-  // Instancie GeoJSON apres rendu
+  // instantiate GeoJSON
+  const firstSource = new VectorSource();
   useEffect(() => {
-    const firstSource = new VectorSource({
-      features: new GeoJSON().readFeatures(data),
-    });
+    firstSource.addFeatures(new GeoJSON().readFeatures(data),)
     const firstVector = new VectorLayer({
       source: firstSource,
       name: 'FT_Chambre',
@@ -281,13 +270,13 @@ const Illion = ({
       }),
     });
     map.addLayer(firstVector);
-    handleLayers(vector.get('name'));
+    handleLayers(firstVector.get('name'), firstSource.getExtent());
   }, []);
 
   const [vectorSource] = useState(
     new VectorSource(),
   );
-  // Instancie DragAndDrop
+  // instantiate DragAndDrop
   useEffect(() => {
     dragAndDropInteraction.on('addfeatures', (event) => {
       vectorSource.addFeatures(event.features);
@@ -326,7 +315,7 @@ const Illion = ({
       map.getView().fit(vectorSource.getExtent());
     });
   }, []);
-  // Instancie overlay
+  // instantiate overlay
   useEffect(() => {
     overlay.setElement(document.getElementById('popup'));
     map.on('click', (evt) => {
@@ -352,29 +341,28 @@ const Illion = ({
     map.addInteraction(dragBox);
     dragBox.on('boxend', () => {
       const extentDragBox = dragBox.getGeometry().getExtent();
+
       map.getLayers().forEach((layer) => {
-        if (layer instanceof TileLayer) {
-          // eslint-disable-next-line no-useless-return
-          return;
-        }
-        // eslint-disable-next-line no-else-return
-        else {
+        // if (layer instanceof TileLayer) {
+        //   // eslint-disable-next-line no-useless-return
+        //   return;
+        // }
+        // // eslint-disable-next-line no-else-return
+        // else {
+        if (!isTileLayer(layer, TileLayer)) {
           layer
             .getSource()
             .forEachFeatureIntersectingExtent(extentDragBox, (feature) => {
               feature.set('name', `feature n°${feature.ol_uid}`);
               feature.set('id', feature.ol_uid);
-              // console.log(feature.getGeometry().getLinearRing().getCoordinates());
               selectedFeatures.push(feature);
             });
-          // handleFeature(selectedFeatures.getArray().map((feature) => feature.get('name')));
           const featuresArr = [];
           selectedFeatures.forEach((feature) => {
             featuresArr.push(feature.get('name'));
           });
           handleFeature(featuresArr);
         }
-        // console.log(layer.getSource())
       });
     });
 
@@ -424,23 +412,17 @@ const Illion = ({
       }
 
       if (event.data[0] === 'deleteAllFeatures') {
-        // selectedFeatures.forEach((feature) => drawSource.removeFeature(feature));
-        // selectedFeatures.forEach((feature) => console.log(feature));
-        console.log(selectedFeatures);
         map
           .getLayers()
           .forEach((layer) => {
             const source = layer.getSource();
-            if (layer instanceof TileLayer) {
-              // eslint-disable-next-line no-useless-return
-              return;
+            if (!isTileLayer(layer, TileLayer)) {
+              source.getFeatures().forEach((feature) => {
+                if (selectedFeatures.getArray().includes(feature)) {
+                  source.removeFeature(feature);
+                }
+              });
             }
-
-            source.getFeatures().forEach((feature) => {
-              if (selectedFeatures.getArray().includes(feature)) {
-                source.removeFeature(feature);
-              }
-            });
           });
       }
 
@@ -460,8 +442,7 @@ const Illion = ({
           );
       }
       if (event.data[0] === 'showLayer') {
-        console.log(event.data[1]);
-        map.getView().fit(map.getExtent(event.data[1]));
+        map.getView().fit(firstSource.getExtent(event.data[1]));
       }
       if (event.data[0] === 'changeColor' && newColor[0].color !== undefined) {
         map
@@ -558,15 +539,11 @@ const Illion = ({
             </IconButton>
           </div>
           <Divider />
-          {open ? (
-            // <List>
-            //   <ListItem>
-            <Menu />
+          <Menu layers={layersActive} drawerState={open} />
+          {/* {open ? (
           ) : (
-            //   </ListItem>
-            // </List>
             ''
-          )}
+          )} */}
         </Drawer>
       </div>
 

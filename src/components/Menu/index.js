@@ -2,15 +2,12 @@ import React, { Fragment } from 'react';
 
 // Import Material UI
 import {
-  Button,
-  Menu,
-  MenuItem,
-  Divider,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
   Collapse,
+  Badge,
 } from '@material-ui/core';
 import { makeStyles, useTheme, withStyles } from '@material-ui/core/styles';
 import {
@@ -29,7 +26,7 @@ import CreateMenu from './Create';
 import EditMenu from './Edit';
 
 // Import container
-// import LayerPaper from '../../containers/LayerPaper';
+import LayerPaper from '../../containers/LayerPaper';
 
 const useStyles = makeStyles((theme) => ({
   nested: {
@@ -46,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const MenuFeatures = () => {
+const MenuFeatures = ({layers, drawerState}) => {
   const [open, setOpen] = React.useState(false);
 
   const handleClick = () => {
@@ -56,37 +53,31 @@ const MenuFeatures = () => {
 
   const buttonsFeature = [
     {
-      type: (
-        <ListItem button className={classes.nested} key="CreateMenu">
-          <ListItemIcon>
-            <CreateIcon />
-          </ListItemIcon>
-          <ListItemText primary={<CreateMenu />} />
-        </ListItem>
-      ),
+      type: <CreateMenu classes={classes.nested} key="CreateMenu" />,
       name: 'Create',
     },
     {
-      type: (
-        <ListItem button className={classes.nested} key="EditMenu">
-          <ListItemIcon>
-            <EditIcon />
-          </ListItemIcon>
-          <ListItemText primary={<EditMenu />} />
-        </ListItem>
-      ),
+      type: <EditMenu classes={classes.nested} key="EditMenu" />,
       name: 'Edit',
     },
   ];
 
   const actions = [
     {
-      title: <LayersIcon color="primary" />,
+      title: (
+        <Badge
+          color="secondary"
+          overlap="circle"
+          badgeContent={layers.length}
+          variant="dot"
+        >
+          <LayersIcon color="primary" fontSize="large" />
+        </Badge>),
       name: 'Open Layers',
-      content: <div className={classes.layerPaper}>{/* <LayerPaper /> */}</div>,
+      content: <div className={classes.layerPaper}><LayerPaper /></div>,
     },
     {
-      title: <GestureIcon color="primary" />,
+      title: <GestureIcon fontSize="large" color="primary" />,
       name: 'Features',
       content: buttonsFeature.map((button) => button.type),
     },
@@ -97,7 +88,12 @@ const MenuFeatures = () => {
       <List className={classes.list}>
         {actions.map((action) => (action.name === 'Features' ? (
           <Fragment key={action.name}>
-            <ListItem button onClick={handleClick}>
+            <ListItem
+              button
+              onClick={() => {
+                handleClick();
+              }}
+            >
               <ListItemIcon>{action.title}</ListItemIcon>
               <ListItemText primary={action.name} />
               {open ? <ExpandLess /> : <ExpandMore />}
@@ -114,7 +110,7 @@ const MenuFeatures = () => {
               <ListItemIcon>{action.title}</ListItemIcon>
               <ListItemText primary={action.name} />
             </ListItem>
-            {action.content}
+            {drawerState ? action.content : ''}
           </Fragment>
         )))}
       </List>

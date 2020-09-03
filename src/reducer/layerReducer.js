@@ -40,10 +40,19 @@ const LayerReducer = (state = initialState, action = {}) => {
     }
     case DELETE_LAYER: {
       const { importedLayers, layers } = state;
-      const indexImportedLayers = importedLayers.indexOf(action.layer);
       const index = layers.indexOf(action.layer);
-      importedLayers.splice(indexImportedLayers, 1);
       layers.splice(index, 1);
+      importedLayers.forEach((importedLayer) => {
+        if (importedLayer.name === action.layer.name) {
+          const indexImportedLayers = importedLayers.indexOf(action.layer);
+          importedLayers.splice(indexImportedLayers, 1);
+          return {
+            ...state,
+            layers: [...layers],
+            importedLayers: [...importedLayers],
+          };
+        }
+      })
       return {
         ...state,
         layers: [...layers],

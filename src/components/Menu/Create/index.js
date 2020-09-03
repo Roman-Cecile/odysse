@@ -2,12 +2,17 @@ import React from 'react';
 
 // Import Material UI
 import {
-  Button,
   Menu,
   MenuItem,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
 } from '@material-ui/core';
+import {
+  Add as CreateIcon,
+} from '@material-ui/icons';
 
-const Create = () => {
+const Create = ({ classes }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   window.addEventListener('keydown', (event) => {
     if (event.keyCode === 27) {
@@ -24,9 +29,14 @@ const Create = () => {
   };
   return (
     <>
-      <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
-        Créer
-      </Button>
+      <ListItem button className={classes}>
+
+        <ListItemIcon onClick={handleClick}>
+          <CreateIcon />
+        </ListItemIcon>
+
+        <ListItemText primary="Créer" onClick={handleClick} />
+      </ListItem>
       <Menu
         id="simple-menu"
         anchorEl={anchorEl}
