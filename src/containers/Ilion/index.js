@@ -1,13 +1,14 @@
 import { connect } from 'react-redux';
 
 import { saveFeatures } from '../../actions/selectFeatureAction';
-import { saveLayers, saveProperties, saveImportedLayers } from '../../actions/saveLayersAction';
+import { saveLayers, saveProperties, saveImportedLayers, saveSomeProperties } from '../../actions/saveLayersAction';
 import ilion from '../../components/Ilion';
 
 const mapStateToProps = (state) => ({
   featuresTarget: state.featureReducer.features,
   layersActive: state.layerReducer.layers,
   coordinates: state.layerReducer.coordinates,
+  someProps: state.layerReducer.someProps,
   properties: state.layerReducer.properties,
   newColor: state.layerReducer.importedLayers,
 });
@@ -20,12 +21,16 @@ const mapDispatchToProps = (dispatch) => ({
   handleLayers: (layerName, layerExtent, color) => {
     dispatch(saveLayers(layerName, layerExtent, color));
   },
-  handleProperties: (properties, coordinates) => {
-    dispatch(saveProperties(properties, coordinates));
+  handleProperties: (event, properties) => {
+    event.preventDefault()
+    dispatch(saveProperties(properties));
   },
   handleImportedLayers: (layerName, layerExtent, color) => {
     dispatch(saveImportedLayers(layerName, layerExtent, color));
   },
+  handleSomeProperties: (properties) => {
+    dispatch(saveSomeProperties(properties))
+  }
 });
 
 export default connect(

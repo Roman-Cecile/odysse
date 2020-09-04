@@ -2,6 +2,7 @@ import {
   SAVE_LAYERS,
   SAVE_PROPERTIES,
   SAVE_IMPORTED_LAYERS,
+  SAVE_SOME_PROPERTIES,
 } from '../actions/saveLayersAction';
 import {
   DELETE_LAYER,
@@ -14,6 +15,7 @@ export const initialState = {
   layers: [],
   importedLayers: [],
   properties: {},
+  someProps: '',
   coordinates: [],
   color: {},
   visibility: true,
@@ -78,6 +80,16 @@ const LayerReducer = (state = initialState, action = {}) => {
         properties: [action.properties],
         coordinates: [action.coordinates],
       };
+    case SAVE_SOME_PROPERTIES: {
+      if (state.properties !== action.properties.ROTATION) {
+        return {
+          ...state,
+          someProps: action.properties.ROTATION,
+
+        };
+      }
+      break;
+    }
     case CHANGE_COLOR: {
       const { importedLayers } = state;
       importedLayers.map((layer) => {

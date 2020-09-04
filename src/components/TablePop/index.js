@@ -44,7 +44,7 @@ const keyProperties = [
 
 const TablePop = ({ properties }) => {
   const classes = useStyles();
-  //   console.log(properties.length && properties[0]);
+    // console.log(someProps);
   return (
     <TableContainer className={classes.tableContainer} component={Paper}>
       <Table className={classes.table} size="small" aria-label="customized table">

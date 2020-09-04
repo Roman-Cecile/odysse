@@ -1,5 +1,6 @@
 // == Import yarn
 import React, { useState, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import clsx from 'clsx';
 import { Map, View, Overlay } from 'ol';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
@@ -34,11 +35,11 @@ import {
   Menu as MenuIcon,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
+  Delete,
 } from '@material-ui/icons';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 // == Import component
-import { matchPath } from 'react-router-dom';
 import Menu from '../Menu';
 
 // Import data GEOJSON
@@ -46,6 +47,7 @@ import data from '../../../public/FT_Chambre_3857.geojson';
 
 // Import container
 import TablePop from '../../containers/TablePop';
+import Tool from '../ToolTip';
 
 // Import utile
 import isTileLayer from '../../utils/layerFilter';
@@ -124,6 +126,13 @@ const useStyles = makeStyles((theme) => ({
   dragBox: {
     border: 'solid 2px blue',
   },
+  tool: {
+    backgroundColor: 'black',
+    color: 'white',
+    width: 40,
+    height: 40,
+    zIndex: 1600,
+  },
 }));
 
 // == Composant
@@ -134,12 +143,16 @@ const ilion = ({
   handleProperties,
   layersActive,
   handleImportedLayers,
+  handleSomeProperties,
+  properties,
+  // someProps,
   newColor,
 }) => {
   const classes = useStyles();
   const [edit, setEdit] = React.useState(false);
   const [create, setCreate] = React.useState(false);
   const theme = useTheme();
+  const [someProperties, setSomeProperties] = React.useState('');
   const [open, setOpen] = React.useState(false);
   const [center, setCenter] = useState([300000, 5900000]);
   const [zoom, setZoom] = useState(6.6);
@@ -149,7 +162,6 @@ const ilion = ({
     1849198.2873332978,
     6657654.787398941,
   ]);
-  const [visible] = useState(true);
 
   let draw;
   let snap;
@@ -206,6 +218,14 @@ const ilion = ({
     },
   });
 
+  const tooltip = new Overlay({
+    element: null,
+    autoPan: true,
+    autoPanAnimation: {
+      duration: 250,
+    },
+  });
+
   const [map] = useState(
     new Map({
       interactions: defaultInteractions({
@@ -217,9 +237,14 @@ const ilion = ({
         altShiftDragRotate: false,
       }).extend([dragAndDropInteraction]),
       target: null,
-      controls: olControl.defaults({ rotate: false }),
+      controls: olControl.defaults({
+        rotate: false,
+        zoom: false,
+        attribution: false,
+        attributionOptions: false,
+      }),
       layers: [raster, vector],
-      overlays: [overlay],
+      overlays: [overlay, tooltip],
       view,
     }),
   );
@@ -264,9 +289,7 @@ const ilion = ({
     handleLayers(firstVector.get('name'), firstSource.getExtent());
   }, []);
 
-  const [vectorSource] = useState(
-    new VectorSource(),
-  );
+  const [vectorSource] = useState(new VectorSource());
   // instantiate DragAndDrop
   useEffect(() => {
     dragAndDropInteraction.on('addfeatures', (event) => {
@@ -307,23 +330,58 @@ const ilion = ({
     });
   }, []);
   // instantiate overlay
+  // useEffect(() => {
+  //   overlay.setElement(document.getElementById('popup'));
+  //   map.on('click', (evt) => {
+  //     if (draw === undefined && map.getFeaturesAtPixel(evt.pixel).length) {
+  //       const coordinate = map.getCoordinateFromPixel(evt.pixel);
+  //       overlay.setPosition(coordinate);
+  //       const pixelFeatures = map.getFeaturesAtPixel(evt.pixel);
+  //       handleProperties(pixelFeatures[0].getProperties());
+  //     }
+  //     else {
+  //       overlay.setPosition(undefined);
+  //     }
+  //   });
+  // }, []);
+
+  // Instanciate tootip
+  // useEffect(() => {
+  //   tooltip.setElement(document.getElementById('tool'));
+  //   map.on('pointermove', (evt) => {
+  //     if (map.hasFeatureAtPixel(evt.pixel)) {
+  //       const pixelFeatures = map.getFeaturesAtPixel(evt.pixel);
+  //       const propsInState = pixelFeatures[0].getProperties().ROTATION;
+  //       if (propsInState !== someProperties.ROTATION) {
+  //         const coordinate = map.getCoordinateFromPixel(evt.pixel);
+  //         tooltip.setPosition(coordinate);
+  //         setSomeProperties(pixelFeatures[0].getProperties().ROTATION);
+  //       }
+  //     }
+  //     else {
+  //       tooltip.setPosition(undefined);
+  //     }
+  //   });
+  //   // console.log(someProperties);
+  // });
+
   useEffect(() => {
-    overlay.setElement(document.getElementById('popup'));
     map.on('click', (evt) => {
-      // console.log(map.getFeaturesAtPixel(evt.pixel).length);
-      if (draw === undefined && map.getFeaturesAtPixel(evt.pixel).length) {
-        const coordinate = map.getCoordinateFromPixel(evt.pixel);
-        overlay.setPosition(coordinate);
+      if (map.getInteractions().getArray().length <= 5
+      && map.getFeaturesAtPixel(evt.pixel).length) {
         const pixelFeatures = map.getFeaturesAtPixel(evt.pixel);
-        handleProperties(pixelFeatures[0].getProperties());
-      }
-      else {
-        overlay.setPosition(undefined);
+        handleProperties(evt, pixelFeatures[0].getProperties());
       }
     });
-  }, []);
+    console.log(draw);
+    if (map.getInteractions().getArray().length <= 5 && properties[0]) {
+      const json = JSON.stringify(properties[0]);
+      localStorage.setItem('properties', json);
+      window.open('new', 'newWindow', 'width= 600, height= 500');
+    }
+  }, [properties]);
 
-  // Instancie dragBox
+  // Instanciate dragBox
   useEffect(() => {
     map.addInteraction(select);
     map.addInteraction(dragBox);
@@ -331,12 +389,6 @@ const ilion = ({
       const extentDragBox = dragBox.getGeometry().getExtent();
 
       map.getLayers().forEach((layer) => {
-        // if (layer instanceof TileLayer) {
-        //   // eslint-disable-next-line no-useless-return
-        //   return;
-        // }
-        // // eslint-disable-next-line no-else-return
-        // else {
         if (!isTileLayer(layer, TileLayer)) {
           layer
             .getSource()
@@ -365,14 +417,14 @@ const ilion = ({
       if (event.data[0] === 'select' || event.data[0] === 'escape') {
         const typeSelect = event.data[1];
         const addInteractions = () => {
-          draw = new Draw({
-            source: drawSource,
-            type: typeSelect,
-          });
-          draw.on('drawend', () => {
-            setEdit(true);
-          });
           if (event.data[0] === 'select') {
+            draw = new Draw({
+              source: drawSource,
+              type: typeSelect,
+            });
+            draw.on('drawend', () => {
+              setEdit(true);
+            });
             map.addInteraction(draw);
             snap = new Snap();
             map.addInteraction(snap);
@@ -391,30 +443,30 @@ const ilion = ({
       }
 
       if (event.data[0] === 'deleteOneFeature') {
-        map
-          .getLayers()
-          .forEach((layer) => {
-            const source = layer.getSource();
-            if (!isTileLayer(layer, TileLayer)) {
-              source.getFeatures().forEach((feature) => feature.get('name') === event.data[1]
-                  && source.removeFeature(feature));
-            }
-          });
+        map.getLayers().forEach((layer) => {
+          const source = layer.getSource();
+          if (!isTileLayer(layer, TileLayer)) {
+            source
+              .getFeatures()
+              .forEach(
+                (feature) => feature.get('name') === event.data[1]
+                  && source.removeFeature(feature),
+              );
+          }
+        });
       }
 
       if (event.data[0] === 'deleteAllFeatures') {
-        map
-          .getLayers()
-          .forEach((layer) => {
-            const source = layer.getSource();
-            if (!isTileLayer(layer, TileLayer)) {
-              source.getFeatures().forEach((feature) => {
-                if (selectedFeatures.getArray().includes(feature)) {
-                  source.removeFeature(feature);
-                }
-              });
-            }
-          });
+        map.getLayers().forEach((layer) => {
+          const source = layer.getSource();
+          if (!isTileLayer(layer, TileLayer)) {
+            source.getFeatures().forEach((feature) => {
+              if (selectedFeatures.getArray().includes(feature)) {
+                source.removeFeature(feature);
+              }
+            });
+          }
+        });
       }
 
       if (event.data[0] === 'edit') {
@@ -436,32 +488,29 @@ const ilion = ({
         map.getView().fit(firstSource.getExtent(event.data[1]));
       }
       if (event.data[0] === 'changeColor' && newColor[0].color !== undefined) {
-        map
-          .getLayers()
-          .forEach(
-            (layer) => {
-              if (layer.get('name') === event.data[1]) {
-              // console.log(layer.getStyle().getFill().setColor());
-              // console.log(layer.getStyle().getStroke().setColor());
-              // console.log(layer.getStyle().getFill().setColor(event.data[2]));
-                layer.getStyle().getFill().setColor(event.data[2]);
-                layer.getStyle().getStroke().setColor(event.data[2]);
-                layer.changed();
-              }
-            },
-          );
+        map.getLayers().forEach((layer) => {
+          if (layer.get('name') === event.data[1]) {
+            // console.log(layer.getStyle().getFill().setColor());
+            // console.log(layer.getStyle().getStroke().setColor());
+            // console.log(layer.getStyle().getFill().setColor(event.data[2]));
+            layer.getStyle().getFill().setColor(event.data[2]);
+            layer.getStyle().getStroke().setColor(event.data[2]);
+            layer.changed();
+          }
+        });
       }
       if (event.data[0] === 'toggleVisible') {
-        map
-          .getLayers()
-          .forEach(
-            (layer) => {
-              if (layer.getVisible()) {
-                return layer.get('name') === event.data[1].name && layer.setVisible(false);
-              }
-              return layer.get('name') === event.data[1].name && layer.setVisible(true);
-            },
+        map.getLayers().forEach((layer) => {
+          if (layer.getVisible()) {
+            return (
+              layer.get('name') === event.data[1].name
+              && layer.setVisible(false)
+            );
+          }
+          return (
+            layer.get('name') === event.data[1].name && layer.setVisible(true)
           );
+        });
       }
     };
   }, []);
@@ -517,10 +566,6 @@ const ilion = ({
           </div>
           <Divider />
           <Menu layers={layersActive} drawerState={open} />
-          {/* {open ? (
-          ) : (
-            ''
-          )} */}
         </Drawer>
       </div>
 
@@ -531,6 +576,15 @@ const ilion = ({
           height: '100vh',
         }}
       />
+      {/* <div
+        id="tool"
+        style={{
+          zIndex: 1500,
+          position: 'absolute',
+        }}
+      >
+        <Tool someProps={someProperties} />
+      </div> */}
       <div
         id="popup"
         style={{
