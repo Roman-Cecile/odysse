@@ -2,7 +2,8 @@ import React, { Fragment, useState, useEffect } from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import { NoMeetingRoom } from '@material-ui/icons';
+import { Edit as EditIcon } from '@material-ui/icons';
+import { Fab, Tooltip } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
   field: {
@@ -10,6 +11,11 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     width: '50%',
     margin: 'auto',
+  },
+  fab: {
+    position: 'fixed',
+    right: 10,
+    bottom: 20,
   },
 }));
 const keyProperties = [
@@ -35,14 +41,14 @@ const keyProperties = [
   'STATUS',
 ];
 
-const Window = ({handleOneFeatureProperties, properties, handleChange}) => {
+const Window = ({ handleOneFeatureProperties, properties, handleChange }) => {
   const classes = useStyles();
   const data = localStorage.getItem('properties');
   const json = JSON.parse(data);
-  // const [properties, setProperties] = useState(json);
+  const [edit, setEdit] = useState(false);
   useEffect(() => {
     handleOneFeatureProperties(json);
-  }, [])
+  }, []);
   function selectType(type) {
     if (Number(type)) {
       return 'number';
@@ -55,28 +61,34 @@ const Window = ({handleOneFeatureProperties, properties, handleChange}) => {
   }
 
   const handleChangeInput = (event) => {
-    handleChange(event.target.name, event.target.value);
+    if (edit) {
+      handleChange(event.target.name, event.target.value);
+    }
   };
 
-  // const editInput = () => console.log('ok');
-
   return (
-    <form className={classes.field}>
-      {keyProperties.map((key) => (
-        <Fragment key={key}>
-          <TextField
-            margin="normal"
-            name={key}
-            label={key}
-            onChange={(event) => handleChangeInput(event)}
-            value={properties[key] || undefined}
-            type={selectType(properties[key])}
-          />
-        </Fragment>
-      ))}
-      <button type="button">Modifier</button>
-    </form>
-
+    <>
+      <form className={classes.field}>
+        {keyProperties.map((key) => (
+          <Fragment key={key}>
+            <TextField
+              margin="normal"
+              name={key}
+              label={key}
+              onChange={(event) => handleChangeInput(event)}
+              value={properties[key] || ''}
+              type={selectType(properties[key])}
+            />
+          </Fragment>
+        ))}
+        {/* <button type="button" onClick={() => setEdit(true)}>Modifier</button> */}
+      </form>
+      <Tooltip title="Modifier" aria-label="edit" placement="left">
+        <Fab className={classes.fab} onClick={() => setEdit(true)} color="secondary" aria-label="edit">
+          <EditIcon />
+        </Fab>
+      </Tooltip>
+    </>
   );
 };
 
