@@ -119,6 +119,7 @@ const ImportedLayer = ({
                 <ClearIcon
                   onClick={() => {
                     window.postMessage(['deleteLayer', layer.name]);
+                    setIsvisible(true)
                     deleteImportedLayer(layer);
                   }}
                   color="secondary"

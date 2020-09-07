@@ -1,31 +1,17 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 
-import { makeStyles, withStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
+import { makeStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
+import { NoMeetingRoom } from '@material-ui/icons';
 
-const useStyles = makeStyles({
-  table: {
-    width: '100%',
+const useStyles = makeStyles((theme) => ({
+  field: {
+    display: 'flex',
+    flexDirection: 'column',
+    width: '50%',
     margin: 'auto',
   },
-  tableContainer: {
-    // backgroundColor: 'black'
-  },
-});
-
-const StyledTableRow = withStyles((theme) => ({
-    root: {
-      '&:nth-of-type(odd)': {
-        backgroundColor: theme.palette.action.hover,
-      },
-    },
-  }))(TableRow);
-
+}));
 const keyProperties = [
   'STATUT',
   'IMPLANT',
@@ -49,49 +35,49 @@ const keyProperties = [
   'STATUS',
 ];
 
-const Window = () => {
+const Window = ({handleOneFeatureProperties, properties, handleChange}) => {
   const classes = useStyles();
   const data = localStorage.getItem('properties');
   const json = JSON.parse(data);
-  const properties = json;
-  return (
-    <TableContainer className={classes.tableContainer} component={Paper}>
-      <Table className={classes.table} size="small" aria-label="customized table">
-        <TableBody>
-          {keyProperties.map((key) => (
-            <Fragment key={key.ID_PROPRIE}>
-              <StyledTableRow>
-                <TableCell component="th" scope="row">
-                  {key}
-                </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
-                  {properties[key]}
-                </TableCell>
-              </StyledTableRow>
-            </Fragment>
-          ))}
+  // const [properties, setProperties] = useState(json);
+  useEffect(() => {
+    handleOneFeatureProperties(json);
+  }, [])
+  function selectType(type) {
+    if (Number(type)) {
+      return 'number';
+    }
+    const checkType = typeof type;
+    if (checkType === 'string') {
+      return 'text';
+    }
+    return 'undefined';
+  }
 
-        </TableBody>
-      </Table>
-    </TableContainer>
+  const handleChangeInput = (event) => {
+    handleChange(event.target.name, event.target.value);
+  };
+
+  // const editInput = () => console.log('ok');
+
+  return (
+    <form className={classes.field}>
+      {keyProperties.map((key) => (
+        <Fragment key={key}>
+          <TextField
+            margin="normal"
+            name={key}
+            label={key}
+            onChange={(event) => handleChangeInput(event)}
+            value={properties[key] || undefined}
+            type={selectType(properties[key])}
+          />
+        </Fragment>
+      ))}
+      <button type="button">Modifier</button>
+    </form>
+
   );
 };
 
 export default Window;
-
-// properties.map((row) => (
-//
-//       {row[key] !== null
-//         ? (
-//           <TableRow>
-//             <TableCell component="th" scope="row">
-//               {key}
-//             </TableCell>
-// <TableCell style={{ width: 160 }} align="right">
-//   {row[key]}
-// </TableCell>
-//           </TableRow>
-//         )
-//         : null}
-//     </Fragment>
-//   ))

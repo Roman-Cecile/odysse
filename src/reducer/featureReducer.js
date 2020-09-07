@@ -1,8 +1,13 @@
-import { SAVE_FEATURES } from 'src/actions/selectFeatureAction';
+import {
+  SAVE_FEATURES,
+  HANDLE_ONE_FEATURE_PROPERTIES,
+  HANDLE_CHANGE,
+} from 'src/actions/selectFeatureAction';
 import { DELETE_FEATURE, DELETE_ALL_FEATURES } from 'src/actions/deleteFeatureAction';
 
 export const initialState = {
   features: [],
+  oneFeatureProperties: {},
 };
 
 const featureReducer = (state = initialState, action = {}) => {
@@ -24,6 +29,18 @@ const featureReducer = (state = initialState, action = {}) => {
       return {
         ...state,
         features: [...state.features],
+      };
+    }
+    case HANDLE_ONE_FEATURE_PROPERTIES:
+      return {
+        ...state,
+        oneFeatureProperties: action.properties,
+      };
+    case HANDLE_CHANGE: {
+      state.oneFeatureProperties[action.name] = action.value;
+      return {
+        ...state,
+        oneFeatureProperties: {...state.oneFeatureProperties}
       };
     }
     case DELETE_ALL_FEATURES:

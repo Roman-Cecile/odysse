@@ -5,7 +5,7 @@ import { Route, Switch } from 'react-router-dom';
 // == Import material UI
 import { makeStyles } from '@material-ui/core/styles';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
+import { Clear as ClearIcon } from '@material-ui/icons';
 import { Slide, Paper } from '@material-ui/core';
 
 // == Import
@@ -19,6 +19,7 @@ const useStyles = makeStyles((theme) => ({
   paperStyleLi: {
     display: 'flex',
     justifyContent: 'space-between',
+    margin: '0.3em auto',
   },
   paperStyle: {
     position: 'fixed',
@@ -27,6 +28,8 @@ const useStyles = makeStyles((theme) => ({
     width: theme.spacing(30),
     zIndex: 20,
     padding: '0.8em',
+    height: 210,
+    overflow: 'auto',
   },
   trash: {
     position: 'sticky',
@@ -40,6 +43,16 @@ const useStyles = makeStyles((theme) => ({
     zIndex: '20',
 
   },
+  title: {
+    color: 'grey',
+    fontStyle: 'italic',
+    fontSize: '0.9em',
+  },
+  titleContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginBottom: theme.spacing(2)
+  }
 }));
 // == Composant
 const App = ({
@@ -62,19 +75,25 @@ const App = ({
               : ' paperStyle '
           }
             >
-              <DeleteForeverIcon
-                className={classes.trash}
-                onClick={() => {
-                  window.postMessage(['deleteAllFeatures', featuresSelected]);
-                  deleteAllFeatures();
-                }}
-              />
+              <div className={classes.titleContainer}>
+
+                <p className={classes.title}>
+                  Features sélectionnés ({featuresSelected.length})
+                </p>
+                <DeleteForeverIcon
+                  className={classes.trash}
+                  onClick={() => {
+                    window.postMessage(['deleteAllFeatures', featuresSelected]);
+                    deleteAllFeatures();
+                  }}
+                />
+              </div>
               <ul>
                 {featuresSelected
                   ? featuresSelected.map((featureName) => (
                     <li className={classes.paperStyleLi}>
                       {featureName}
-                      <CancelOutlinedIcon
+                      <ClearIcon
                         fontSize="small"
                         color="secondary"
                         onClick={(event) => {

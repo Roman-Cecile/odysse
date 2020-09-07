@@ -377,7 +377,7 @@ const ilion = ({
     if (map.getInteractions().getArray().length <= 5 && properties[0]) {
       const json = JSON.stringify(properties[0]);
       localStorage.setItem('properties', json);
-      window.open('new', 'newWindow', 'width= 600, height= 500');
+      window.open('new', 'newWindow', 'width= 700, height= 450');
     }
   }, [properties]);
 
