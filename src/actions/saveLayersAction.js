@@ -22,7 +22,8 @@ export const saveProperties = (properties, coordinates) => ({
   coordinates,
 });
 
-export const saveSomeProperties = (properties) => ({
+export const saveSomeProperties = (properties, length) => ({
   type: SAVE_SOME_PROPERTIES,
   properties,
+  length,
 });

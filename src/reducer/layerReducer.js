@@ -15,7 +15,8 @@ export const initialState = {
   layers: [],
   importedLayers: [],
   properties: {},
-  someProps: '',
+  someProps: {},
+  length: 0,
   coordinates: [],
   color: {},
   visibility: true,
@@ -80,16 +81,13 @@ const LayerReducer = (state = initialState, action = {}) => {
         properties: [action.properties],
         coordinates: [action.coordinates],
       };
-    case SAVE_SOME_PROPERTIES: {
-      if (state.properties !== action.properties.ROTATION) {
-        return {
-          ...state,
-          someProps: action.properties.ROTATION,
+    case SAVE_SOME_PROPERTIES:
+      return {
+        ...state,
+        someProps: action.properties,
+        length: action.length,
 
-        };
-      }
-      break;
-    }
+      };
     case CHANGE_COLOR: {
       const { importedLayers } = state;
       importedLayers.map((layer) => {

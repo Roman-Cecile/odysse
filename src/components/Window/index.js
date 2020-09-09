@@ -19,28 +19,7 @@ const useStyles = makeStyles((theme) => ({
     bottom: 20,
   },
 }));
-// const keyProperties = [
-//   'STATUT',
-//   'IMPLANT',
-//   'NATURE_CHA',
-//   'REF_CHAMBR',
-//   'REF_NOTE',
-//   'CODE_COM',
-//   'CODE_VOIE',
-//   'NUM_VOIE',
-//   'ID_PROPRIE',
-//   'TYPE_TRAPP',
-//   'QUANTIFICA',
-//   'ROTATION',
-//   'CODE_CH1',
-//   'CODE_CH2',
-//   'SECURISEE',
-//   'CLE_MKT1',
-//   'CODE_CH1_C',
-//   'CODE_CH2_P',
-//   'CLASSE',
-//   'STATUS',
-// ];
+
 const keyProperties = [];
 
 const Window = ({ handleOneFeatureProperties, properties, handleChange }) => {
