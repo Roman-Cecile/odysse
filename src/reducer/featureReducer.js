@@ -36,26 +36,23 @@ const featureReducer = (state = initialState, action = {}) => {
         ...state,
         oneFeatureProperties: action.properties,
       };
-    case HANDLE_CHANGE: {
-      const object = state.oneFeatureProperties;
-      // eslint-disable-next-line no-restricted-syntax
-      for (const key in object) {
-        if (key === action.name) {
-          return {
-            ...state,
-            oneFeatureProperties: {
-              ...state.oneFeatureProperties,
-              [key]: action.value,
-            },
-          };
-        }
-      }
-      // return {
-      //   ...state,
-      //   oneFeatureProperties: state.oneFeatureProperties,
-      // };
-      break;
-    }
+    case HANDLE_CHANGE:
+      // for (const key in object) {
+      //   if (key === action.name) {
+      //     return {
+      //       ...state,
+      //       oneFeatureProperties: {
+      //         ...state.oneFeatureProperties,
+      //         [key]: action.value,
+      //       },
+      //     };
+      //   }
+      // }
+      state.oneFeatureProperties[action.name] = action.value;
+      return {
+        ...state,
+        oneFeatureProperties: { ...state.oneFeatureProperties },
+      };
     case DELETE_ALL_FEATURES:
       return {
         ...state,
