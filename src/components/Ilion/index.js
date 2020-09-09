@@ -20,6 +20,7 @@ import {
 import { platformModifierKeyOnly } from 'ol/events/condition';
 import { GeoJSON } from 'ol/format';
 import * as olControl from 'ol/control';
+import { getLength } from 'ol/sphere';
 
 // Import Material UI
 import {
@@ -40,6 +41,8 @@ import {
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 // == Import component
+import LineString from 'ol/geom/LineString';
+import { instanceOf } from 'prop-types';
 import Menu from '../Menu';
 
 // Import data GEOJSON
@@ -47,7 +50,7 @@ import data from '../../../public/FT_Chambre_3857.geojson';
 
 // Import container
 import TablePop from '../../containers/TablePop';
-import Tool from '../ToolTip';
+import Tool from '../../containers/ToolTip';
 
 // Import utile
 import isTileLayer from '../../utils/layerFilter';
@@ -210,13 +213,13 @@ const ilion = ({
     }),
   });
 
-  const overlay = new Overlay({
-    element: null,
-    autoPan: true,
-    autoPanAnimation: {
-      duration: 250,
-    },
-  });
+  // const overlay = new Overlay({
+  //   element: null,
+  //   autoPan: true,
+  //   autoPanAnimation: {
+  //     duration: 250,
+  //   },
+  // });
 
   const tooltip = new Overlay({
     element: null,
@@ -224,6 +227,7 @@ const ilion = ({
     autoPanAnimation: {
       duration: 250,
     },
+    offset: [15, 15],
   });
 
   const [map] = useState(
@@ -244,7 +248,7 @@ const ilion = ({
         attributionOptions: false,
       }),
       layers: [raster, vector],
-      overlays: [overlay, tooltip],
+      overlays: [tooltip],
       view,
     }),
   );
@@ -329,21 +333,33 @@ const ilion = ({
       map.getView().fit(vectorSource.getExtent());
     });
   }, []);
+
   // instantiate overlay
-  // useEffect(() => {
-  //   overlay.setElement(document.getElementById('popup'));
-  //   map.on('click', (evt) => {
-  //     if (draw === undefined && map.getFeaturesAtPixel(evt.pixel).length) {
-  //       const coordinate = map.getCoordinateFromPixel(evt.pixel);
-  //       overlay.setPosition(coordinate);
-  //       const pixelFeatures = map.getFeaturesAtPixel(evt.pixel);
-  //       handleProperties(pixelFeatures[0].getProperties());
-  //     }
-  //     else {
-  //       overlay.setPosition(undefined);
-  //     }
-  //   });
-  // }, []);
+  useEffect(() => {
+    tooltip.setElement(document.getElementById('tool'));
+    map.on('pointermove', (evt) => {
+      if (draw === undefined && map.getFeaturesAtPixel(evt.pixel).length) {
+        const featureAtPixel = map.getFeaturesAtPixel(evt.pixel);
+        const geom = featureAtPixel[0].getGeometry();
+        let length;
+        if (geom instanceof LineString) {
+          // length = getLength(featureAtPixel[0].getGeometry());
+
+          length = geom.getLength();
+          length = `${Math.round((length / 10) * 100)} m`;
+        }
+        // geom.set('name', '!!!!test!!!')
+        // console.log(geom.getType());
+        const coordinate = map.getCoordinateFromPixel(evt.pixel);
+        tooltip.setPosition(coordinate);
+        const pixelFeatures = map.getFeaturesAtPixel(evt.pixel);
+        handleSomeProperties(pixelFeatures[0].getProperties(), length);
+      }
+      else {
+        tooltip.setPosition(undefined);
+      }
+    });
+  }, []);
 
   // Instanciate tootip
   // useEffect(() => {
@@ -370,10 +386,9 @@ const ilion = ({
       if (map.getInteractions().getArray().length <= 5
       && map.getFeaturesAtPixel(evt.pixel).length) {
         const pixelFeatures = map.getFeaturesAtPixel(evt.pixel);
-        handleProperties(evt, pixelFeatures[0].getProperties());
+        handleProperties(pixelFeatures[0].getProperties());
       }
     });
-    console.log(draw);
     if (map.getInteractions().getArray().length <= 5 && properties[0]) {
       const json = JSON.stringify(properties[0]);
       localStorage.setItem('properties', json);
@@ -431,7 +446,7 @@ const ilion = ({
           }
           else if (event.data[0] === 'escape') {
             setCreate(false);
-            overlay.setPosition(undefined);
+            tooltip.setPosition(undefined);
             draw.finishDrawing();
             draw = undefined;
           }
@@ -576,7 +591,7 @@ const ilion = ({
           height: '100vh',
         }}
       />
-      {/* <div
+      <div
         id="tool"
         style={{
           zIndex: 1500,
@@ -584,8 +599,8 @@ const ilion = ({
         }}
       >
         <Tool someProps={someProperties} />
-      </div> */}
-      <div
+      </div>
+      {/* <div
         id="popup"
         style={{
           zIndex: 1500,
@@ -593,7 +608,7 @@ const ilion = ({
         }}
       >
         <TablePop />
-      </div>
+      </div> */}
     </>
   );
 };

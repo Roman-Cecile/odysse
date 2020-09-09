@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { Fragment, useState, useEffect } from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -18,34 +19,41 @@ const useStyles = makeStyles((theme) => ({
     bottom: 20,
   },
 }));
-const keyProperties = [
-  'STATUT',
-  'IMPLANT',
-  'NATURE_CHA',
-  'REF_CHAMBR',
-  'REF_NOTE',
-  'CODE_COM',
-  'CODE_VOIE',
-  'NUM_VOIE',
-  'ID_PROPRIE',
-  'TYPE_TRAPP',
-  'QUANTIFICA',
-  'ROTATION',
-  'CODE_CH1',
-  'CODE_CH2',
-  'SECURISEE',
-  'CLE_MKT1',
-  'CODE_CH1_C',
-  'CODE_CH2_P',
-  'CLASSE',
-  'STATUS',
-];
+// const keyProperties = [
+//   'STATUT',
+//   'IMPLANT',
+//   'NATURE_CHA',
+//   'REF_CHAMBR',
+//   'REF_NOTE',
+//   'CODE_COM',
+//   'CODE_VOIE',
+//   'NUM_VOIE',
+//   'ID_PROPRIE',
+//   'TYPE_TRAPP',
+//   'QUANTIFICA',
+//   'ROTATION',
+//   'CODE_CH1',
+//   'CODE_CH2',
+//   'SECURISEE',
+//   'CLE_MKT1',
+//   'CODE_CH1_C',
+//   'CODE_CH2_P',
+//   'CLASSE',
+//   'STATUS',
+// ];
+const keyProperties = [];
 
 const Window = ({ handleOneFeatureProperties, properties, handleChange }) => {
   const classes = useStyles();
   const data = localStorage.getItem('properties');
   const json = JSON.parse(data);
   const [edit, setEdit] = useState(false);
+  // eslint-disable-next-line no-restricted-syntax
+  for (const key in properties) {
+    if (properties[key] && key !== 'geometry') {
+      keyProperties.push(key);
+    }
+  }
   useEffect(() => {
     handleOneFeatureProperties(json);
   }, []);

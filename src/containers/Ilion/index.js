@@ -21,8 +21,7 @@ const mapDispatchToProps = (dispatch) => ({
   handleLayers: (layerName, layerExtent, color) => {
     dispatch(saveLayers(layerName, layerExtent, color));
   },
-  handleProperties: (event, properties) => {
-    event.preventDefault()
+  handleProperties: (properties) => {
     dispatch(saveProperties(properties));
   },
   handleImportedLayers: (layerName, layerExtent, color) => {

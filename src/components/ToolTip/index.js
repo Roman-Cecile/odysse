@@ -14,14 +14,11 @@ const useStyles = makeStyles({
 
 const ToolTip = ({ someProps }) => {
   const classes = useStyles();
+  console.log(someProps);
   return (
-    <p
-      className={
-        classes.table
-        }
-    >
-      {someProps}
-    </p>
+    <ul>
+      <li>{someProps.STATUT}</li>
+    </ul>
   );
 };
 
