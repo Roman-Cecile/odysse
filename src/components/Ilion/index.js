@@ -43,6 +43,7 @@ import { makeStyles, useTheme } from '@material-ui/core/styles';
 // == Import component
 import LineString from 'ol/geom/LineString';
 import { instanceOf } from 'prop-types';
+import MultiPolygon from 'ol/geom/MultiPolygon';
 import Menu from '../Menu';
 
 // Import data GEOJSON
@@ -180,6 +181,19 @@ const ilion = ({
   const color = getRandomColor();
   const randColor = (col) => col === color && getRandomColor();
 
+  const getTransparencyRandomColor = () => {
+    const trans = '0.5'; // 50% transparency
+    let colorRGBA = 'rgba(';
+    for (let i = 0; i < 3; i++) {
+      colorRGBA += `${Math.floor(Math.random() * 255)},`;
+    }
+    colorRGBA += `${trans})`; // add the transparency
+    return colorRGBA;
+  };
+
+  const transparency = getTransparencyRandomColor();
+  const transparencyRandColor = (col) => col === transparency && getTransparencyRandomColor();
+
   const dragAndDropInteraction = new DragAndDrop({
     formatConstructors: [GeoJSON],
   });
@@ -212,14 +226,6 @@ const ilion = ({
       }),
     }),
   });
-
-  // const overlay = new Overlay({
-  //   element: null,
-  //   autoPan: true,
-  //   autoPanAnimation: {
-  //     duration: 250,
-  //   },
-  // });
 
   const tooltip = new Overlay({
     element: null,
@@ -293,43 +299,75 @@ const ilion = ({
     handleLayers(firstVector.get('name'), firstSource.getExtent());
   }, []);
 
-  const [vectorSource] = useState(new VectorSource());
+  // const [vectorSource] = useState(new VectorSource());
   // instantiate DragAndDrop
   useEffect(() => {
     dragAndDropInteraction.on('addfeatures', (event) => {
-      vectorSource.addFeatures(event.features);
+      const vectorSource = new VectorSource({
+        features: event.features,
+      });
+      // vectorSource.addFeatures(event.features);
       const indexOfExtention = event.file.name.length - 8;
       const splitFileName = event.file.name.split('');
       const removeExtention = splitFileName.slice(0, indexOfExtention);
       const fileName = removeExtention.join('');
       const colorLayer = randColor(color);
-      event.file.color = colorLayer;
-      const fileColor = event.file.color;
-      map.addLayer(
-        new VectorLayer({
-          source: vectorSource,
-          name: fileName,
-          extent: event.projection.getExtent(),
-          style: new Style({
+      const transparencyColorLayer = transparencyRandColor(transparency);
+      let fileColor;
+      let test;
+      event.features.forEach((feature) => {
+        if (feature.getGeometry() instanceof MultiPolygon) {
+          test= true;
+          fileColor = new Style({
             fill: new Fill({
-              color: fileColor,
+              color: transparencyColorLayer,
             }),
             stroke: new Stroke({
-              color: fileColor,
+              color: '#fff',
+              lineDash: [15],
+              // lineDashOffset: 2,
               width: 2,
             }),
             image: new CircleStyle({
               radius: 7,
               fill: new Fill({
-                color: fileColor,
+                color: transparencyColorLayer,
               }),
             }),
-          }),
+          });
+        }
+        else if (feature.getGeometry() instanceof LineString) {
+          test = false;
+          fileColor = new Style({
+            fill: new Fill({
+              color: colorLayer,
+            }),
+            stroke: new Stroke({
+              color: colorLayer,
+              width: 2,
+            }),
+            image: new CircleStyle({
+              radius: 7,
+              fill: new Fill({
+                color: colorLayer,
+              }),
+            }),
+          });
+        }
+      });
+      map.addLayer(
+        new VectorLayer({
+          source: vectorSource,
+          name: fileName,
+          extent: event.projection.getExtent(),
+          style: fileColor,
         }),
       );
+      // console.log(color);
+      const goodColor = test ? transparencyColorLayer : colorLayer;
       const layerExtent = event.projection.getExtent();
-      handleLayers(fileName, layerExtent, fileColor);
-      handleImportedLayers(fileName, layerExtent, fileColor);
+      handleLayers(fileName, layerExtent, goodColor);
+      handleImportedLayers(fileName, layerExtent, goodColor);
       map.getView().fit(vectorSource.getExtent());
     });
   }, []);
@@ -360,26 +398,6 @@ const ilion = ({
       }
     });
   }, []);
-
-  // Instanciate tootip
-  // useEffect(() => {
-  //   tooltip.setElement(document.getElementById('tool'));
-  //   map.on('pointermove', (evt) => {
-  //     if (map.hasFeatureAtPixel(evt.pixel)) {
-  //       const pixelFeatures = map.getFeaturesAtPixel(evt.pixel);
-  //       const propsInState = pixelFeatures[0].getProperties().ROTATION;
-  //       if (propsInState !== someProperties.ROTATION) {
-  //         const coordinate = map.getCoordinateFromPixel(evt.pixel);
-  //         tooltip.setPosition(coordinate);
-  //         setSomeProperties(pixelFeatures[0].getProperties().ROTATION);
-  //       }
-  //     }
-  //     else {
-  //       tooltip.setPosition(undefined);
-  //     }
-  //   });
-  //   // console.log(someProperties);
-  // });
 
   useEffect(() => {
     map.on('click', (evt) => {

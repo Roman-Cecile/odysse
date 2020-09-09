@@ -65,11 +65,11 @@ const Create = ({ classes }) => {
         <MenuItem
           onClick={() => {
             handleClose();
-            window.postMessage(['select', 'Polygon']);
+            window.postMessage(['select', 'MultiPolygon']);
           }}
-          id="Polygon"
+          id="MultiPolygon"
         >
-          Polygon
+          MultiPolygon
         </MenuItem>
         <MenuItem
           onClick={() => {
