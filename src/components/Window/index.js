@@ -3,7 +3,7 @@ import React, { Fragment, useState, useEffect } from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import { Edit as EditIcon } from '@material-ui/icons';
+import { Edit as EditIcon, Save as SaveIcon } from '@material-ui/icons';
 import { Fab, Tooltip } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
@@ -17,6 +17,11 @@ const useStyles = makeStyles((theme) => ({
     position: 'fixed',
     right: 10,
     bottom: 20,
+  },
+  fabSave: {
+    position: 'fixed',
+    right: 10,
+    bottom: 90,
   },
 }));
 
@@ -60,6 +65,7 @@ const Window = ({ handleOneFeatureProperties, properties, handleChange }) => {
           <Fragment key={key}>
             <TextField
               margin="normal"
+              disabled={!edit}
               name={key}
               label={key}
               onChange={(event) => handleChangeInput(event)}
@@ -68,10 +74,17 @@ const Window = ({ handleOneFeatureProperties, properties, handleChange }) => {
             />
           </Fragment>
         ))}
-        {/* <button type="button" onClick={() => setEdit(true)}>Modifier</button> */}
+        {edit
+        && (
+        <Tooltip title="Sauvegarder" aria-label="save" placement="left">
+          <Fab className={classes.fabSave} onClick={() => setEdit(false)} color="primary">
+            <SaveIcon />
+          </Fab>
+        </Tooltip>
+        )}
       </form>
       <Tooltip title="Modifier" aria-label="edit" placement="left">
-        <Fab className={classes.fab} onClick={() => setEdit(true)} color="secondary" aria-label="edit">
+        <Fab disabled={edit} className={classes.fab} onClick={() => setEdit(true)} color="secondary" aria-label="edit">
           <EditIcon />
         </Fab>
       </Tooltip>
