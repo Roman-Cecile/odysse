@@ -24,8 +24,8 @@ const mapDispatchToProps = (dispatch) => ({
   handleProperties: (properties) => {
     dispatch(saveProperties(properties));
   },
-  handleImportedLayers: (layerName, layerExtent, color) => {
-    dispatch(saveImportedLayers(layerName, layerExtent, color));
+  handleImportedLayers: (layerName, layerExtent, color, geom) => {
+    dispatch(saveImportedLayers(layerName, layerExtent, color, geom));
   },
   handleSomeProperties: (properties, length) => {
     dispatch(saveSomeProperties(properties, length))

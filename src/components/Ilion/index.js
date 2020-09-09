@@ -194,6 +194,9 @@ const ilion = ({
   const transparency = getTransparencyRandomColor();
   const transparencyRandColor = (col) => col === transparency && getTransparencyRandomColor();
 
+  const insert = (mainString, insString, pos) => (
+    mainString.slice(0, pos) + insString + mainString.slice(pos)
+  );
   const dragAndDropInteraction = new DragAndDrop({
     formatConstructors: [GeoJSON],
   });
@@ -364,9 +367,13 @@ const ilion = ({
         }),
       );
       const goodColor = test ? transparencyColorLayer : colorLayer;
-      const layerExtent = event.projection.getExtent();
+      let isMultiPolygon;
+      event.features.forEach((feature) => {
+        const geom = feature.getGeometry();
+        isMultiPolygon = geom instanceof MultiPolygon;
+      });
       handleLayers(fileName, vectorSource.getExtent(), goodColor);
-      handleImportedLayers(fileName, vectorSource.getExtent(), goodColor);
+      handleImportedLayers(fileName, vectorSource.getExtent(), goodColor, isMultiPolygon);
       map.getView().fit(vectorSource.getExtent());
     });
   }, []);
@@ -532,12 +539,22 @@ const ilion = ({
       }
       if (event.data[0] === 'changeColor' && newColor[0].color !== undefined) {
         map.getLayers().forEach((layer) => {
-          if (layer.get('name') === event.data[1]) {
-            // console.log(layer.getStyle().getFill().setColor());
-            // console.log(layer.getStyle().getStroke().setColor());
-            // console.log(layer.getStyle().getFill().setColor(event.data[2]));
-            layer.getStyle().getFill().setColor(event.data[2]);
-            layer.getStyle().getStroke().setColor(event.data[2]);
+          if (layer.get('name') === event.data[1] && !event.data[3]) {
+            const paramsR = event.data[2].r;
+            const paramsG = event.data[2].g;
+            const paramsB = event.data[2].b;
+            layer.getStyle().getFill().setColor(`rgba(${paramsR},${paramsG},${paramsB})`);
+            layer.getStyle().getStroke().setColor(`rgba(${paramsR},${paramsG},${paramsB})`);
+            layer.changed();
+          }
+          else if (layer.get('name') === event.data[1] && event.data[3]) {
+            const paramsR = event.data[2].r;
+            const paramsG = event.data[2].g;
+            const paramsB = event.data[2].b;
+            event.data[2].a = 0.5;
+            const paramsA = event.data[2].a;
+            layer.getStyle().getFill().setColor(`rgba(${paramsR},${paramsG},${paramsB},${paramsA})`);
+            layer.getStyle().getStroke().setColor(`rgba(${paramsR},${paramsG},${paramsB},${paramsA})`);
             layer.changed();
           }
         });

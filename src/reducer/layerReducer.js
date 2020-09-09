@@ -35,7 +35,12 @@ const LayerReducer = (state = initialState, action = {}) => {
     }
     case SAVE_IMPORTED_LAYERS: {
       const layerInState = state.importedLayers;
-      const newLayer = { name: action.layerName, extent: action.layerExtent, color: action.color };
+      const newLayer = { 
+        name: action.layerName,
+        extent: action.layerExtent,
+        color: action.color,
+        isMultiPolygon: action.geom,
+      };
       layerInState.push(newLayer);
       return {
         ...state,

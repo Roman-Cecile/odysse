@@ -80,7 +80,7 @@ const ImportedLayer = ({
                     className={classes.pickerColor}
                     onChange={(evt) => {
                       handleNewColor(evt, layer.name);
-                      window.postMessage(['changeColor', layer.name, evt.hex]);
+                      window.postMessage(['changeColor', layer.name, evt.rgb, layer.isMultiPolygon]);
                     }}
                   />
                   )}

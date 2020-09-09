@@ -9,11 +9,12 @@ export const saveLayers = (layerName, layerExtent) => ({
   layerExtent,
 });
 
-export const saveImportedLayers = (layerName, layerExtent, color) => ({
+export const saveImportedLayers = (layerName, layerExtent, color, geom) => ({
   type: SAVE_IMPORTED_LAYERS,
   layerName,
   layerExtent,
   color,
+  geom,
 });
 
 export const saveProperties = (properties, coordinates) => ({
