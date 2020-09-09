@@ -317,7 +317,7 @@ const ilion = ({
       let test;
       event.features.forEach((feature) => {
         if (feature.getGeometry() instanceof MultiPolygon) {
-          test= true;
+          test = true;
           fileColor = new Style({
             fill: new Fill({
               color: transparencyColorLayer,
@@ -363,11 +363,10 @@ const ilion = ({
           style: fileColor,
         }),
       );
-      // console.log(color);
       const goodColor = test ? transparencyColorLayer : colorLayer;
       const layerExtent = event.projection.getExtent();
-      handleLayers(fileName, layerExtent, goodColor);
-      handleImportedLayers(fileName, layerExtent, goodColor);
+      handleLayers(fileName, vectorSource.getExtent(), goodColor);
+      handleImportedLayers(fileName, vectorSource.getExtent(), goodColor);
       map.getView().fit(vectorSource.getExtent());
     });
   }, []);
@@ -518,7 +517,18 @@ const ilion = ({
           );
       }
       if (event.data[0] === 'showLayer') {
-        map.getView().fit(firstSource.getExtent(event.data[1]));
+        map
+          .getLayers()
+          .forEach((layer) => {
+            const source = layer.getSource();
+            console.log(event.data[1]);
+            if (!isTileLayer(layer, TileLayer) && layer.get('name') === event.data[1]) {
+              map.getView().fit(source.getExtent());
+
+            //   // console.log(source.getExtent(event.data[1]));
+            }
+          });
+        // map.getView().fit(firstSource.getExtent(event.data[1]));
       }
       if (event.data[0] === 'changeColor' && newColor[0].color !== undefined) {
         map.getLayers().forEach((layer) => {

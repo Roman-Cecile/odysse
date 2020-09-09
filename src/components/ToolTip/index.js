@@ -29,7 +29,6 @@ const ToolTip = ({ someProps, length }) => {
     for (const key in someProps) {
       if (key !== 'geometry' && keyProperties.length < 3) {
         keyProperties.push(key);
-        console.log(key);
       }
     }
   }, [someProps])

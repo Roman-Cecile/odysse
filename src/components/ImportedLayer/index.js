@@ -87,7 +87,7 @@ const ImportedLayer = ({
                 </div>
                 <div
                   onClick={() => {
-                    window.postMessage(['showLayer', layer.extent]);
+                    window.postMessage(['showLayer', layer.name]);
                   }}
                   style={{ cursor: 'pointer', marginLeft: 5 }}
                 >

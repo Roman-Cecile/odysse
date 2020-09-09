@@ -43,7 +43,9 @@ const LayerPaper = ({ layersActive, deleteLayer }) => {
       {layersActive.length > 0
         ? layersActive.map((layer) => (
           <li className={classes.paperLi} key={layer.name}>
-            <span className={classes.layerActive} onClick={() => window.postMessage(['showLayer', layer.extent])}>
+            <span
+              className={classes.layerActive}
+              onClick={() => window.postMessage(['showLayer', layer.name])}>
               {layer.name}
             </span>
             <ClearIcon
