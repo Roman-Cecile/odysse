@@ -31,10 +31,9 @@ const Window = ({ handleOneFeatureProperties, properties, handleChange }) => {
   const classes = useStyles();
   const data = localStorage.getItem('properties');
   const json = JSON.parse(data);
-  const [edit, setEdit] = useState(false);
   // eslint-disable-next-line no-restricted-syntax
   for (const key in properties) {
-    if (properties[key] && key !== 'geometry') {
+    if (key !== 'geometry' && !keyProperties.includes(key) ) {
       keyProperties.push(key);
     }
   }
@@ -51,13 +50,13 @@ const Window = ({ handleOneFeatureProperties, properties, handleChange }) => {
     }
     return 'undefined';
   }
-
+  
+  const [edit, setEdit] = useState(false);
   const handleChangeInput = (event) => {
     if (edit) {
-      handleChange(event.target.name, event.target.value);
+      handleChange(event);
     }
   };
-
   return (
     <>
       <form className={classes.field}>
@@ -84,7 +83,15 @@ const Window = ({ handleOneFeatureProperties, properties, handleChange }) => {
         )}
       </form>
       <Tooltip title="Modifier" aria-label="edit" placement="left">
-        <Fab disabled={edit} className={classes.fab} onClick={() => setEdit(true)} color="secondary" aria-label="edit">
+        <Fab
+          disabled={edit}
+          className={classes.fab}
+          onClick={(event) => {
+            event.preventDefault()
+            setEdit(true)
+          }}
+          color="secondary"
+          aria-label="edit">
           <EditIcon />
         </Fab>
       </Tooltip>

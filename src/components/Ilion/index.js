@@ -554,7 +554,7 @@ const ilion = ({
             event.data[2].a = 0.5;
             const paramsA = event.data[2].a;
             layer.getStyle().getFill().setColor(`rgba(${paramsR},${paramsG},${paramsB},${paramsA})`);
-            layer.getStyle().getStroke().setColor(`rgba(${paramsR},${paramsG},${paramsB},${paramsA})`);
+            // layer.getStyle().getStroke().setColor(`rgba(${paramsR},${paramsG},${paramsB},${paramsA})`);
             layer.changed();
           }
         });

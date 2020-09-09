@@ -11,8 +11,8 @@ const mapDispatchToProps = (dispatch) => ({
   handleOneFeatureProperties: (properties) => {
     dispatch(handleOneFeatureProperties(properties));
   },
-   handleChange: (name, value) => {
-     dispatch(handleChange(name, value));
+   handleChange: (event) => {
+     dispatch(handleChange(event.target.name, event.target.value));
    }
 });
 
