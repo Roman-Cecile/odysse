@@ -2,6 +2,7 @@ import { connect } from 'react-redux';
 
 import { saveFeatures } from '../../actions/selectFeatureAction';
 import { saveLayers, saveProperties, saveImportedLayers, saveSomeProperties } from '../../actions/saveLayersAction';
+// import ilion from '../../components/Ilion/newIlion';
 import ilion from '../../components/Ilion';
 
 const mapStateToProps = (state) => ({
