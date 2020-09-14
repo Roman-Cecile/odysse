@@ -56,6 +56,9 @@ const ImportedLayer = ({
     setTargetColor(target);
     setOpen(!open);
   };
+  function rgbToHex(r, g, b) {
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  }
   return (
     <>
       <p className={classes.title}>
@@ -68,7 +71,7 @@ const ImportedLayer = ({
               <div className={classes.titleAndColor}>
                 <div
                   className={classes.color}
-                  style={{ backgroundColor: layer.color }}
+                  style={{ backgroundColor: layer.hex || layer.color }}
                   id={layer.name}
                   onClick={(event) => (
                     event.target.id === layer.name
@@ -98,12 +101,12 @@ const ImportedLayer = ({
                 {isVisible
                   ? (
                     <VisibilityIcon
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => {
-                        window.postMessage(['toggleVisible', layer]);
-                        setIsvisible(false);
-                      }}
-                    />
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => {
+                      window.postMessage(['toggleVisible', layer]);
+                      setIsvisible(false);
+                    }}
+                  />
 
                   )
                   : (

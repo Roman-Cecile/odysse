@@ -34,18 +34,23 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+
 const LayerPaper = ({ layersActive, deleteLayer }) => {
   const classes = useStyles();
+  const handleClick = (layerName) => {
+    window.postMessage(['showLayer', layerName], "*")
+  }
 
   return (
 
     <Paper elevation={0}>
-      {layersActive.length > 0
+      {layersActive && layersActive.length > 0
         ? layersActive.map((layer) => (
           <li className={classes.paperLi} key={layer.name}>
             <span
               className={classes.layerActive}
-              onClick={() => window.postMessage(['showLayer', layer.name])}>
+              onClick={() => window.postMessage(['showLayer', layer.name], "*")}
+            >
               {layer.name}
             </span>
             <ClearIcon
@@ -53,7 +58,7 @@ const LayerPaper = ({ layersActive, deleteLayer }) => {
               color="secondary"
               onClick={() => {
                 deleteLayer(layer);
-                window.postMessage(['deleteLayer', layer.name]);
+                window.postMessage(['deleteLayer', layer.name], "*");
               }}
             />
           </li>

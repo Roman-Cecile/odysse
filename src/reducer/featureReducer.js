@@ -2,8 +2,8 @@ import {
   SAVE_FEATURES,
   HANDLE_ONE_FEATURE_PROPERTIES,
   HANDLE_CHANGE,
-} from 'src/actions/selectFeatureAction';
-import { DELETE_FEATURE, DELETE_ALL_FEATURES } from 'src/actions/deleteFeatureAction';
+} from '../actions/selectFeatureAction';
+import { DELETE_FEATURE, DELETE_ALL_FEATURES } from '../actions/deleteFeatureAction';
 
 export const initialState = {
   features: [],
@@ -31,11 +31,13 @@ const featureReducer = (state = initialState, action = {}) => {
         features: [...state.features],
       };
     }
-    case HANDLE_ONE_FEATURE_PROPERTIES:
+    case HANDLE_ONE_FEATURE_PROPERTIES: {
+      // eslint-disable-next-line no-restricted-syntax
       return {
         ...state,
         oneFeatureProperties: action.properties,
       };
+    }
     case HANDLE_CHANGE:
       // for (const key in object) {
       //   if (key === action.name) {

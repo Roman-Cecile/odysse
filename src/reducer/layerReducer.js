@@ -95,9 +95,12 @@ const LayerReducer = (state = initialState, action = {}) => {
       };
     case CHANGE_COLOR: {
       const { importedLayers } = state;
+      console.log('hex', action.hex);
+      console.log('rgb', action.rgb);
       importedLayers.map((layer) => {
         if (layer.name === action.name) {
-          layer.color = action.hex;
+          layer.color = action.rgb;
+          layer.hex = action.hex;
         }
       });
 

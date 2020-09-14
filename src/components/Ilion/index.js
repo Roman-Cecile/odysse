@@ -149,6 +149,7 @@ const ilion = ({
   handleImportedLayers,
   handleSomeProperties,
   properties,
+  initiateAxios,
   // someProps,
   newColor,
 }) => {
@@ -211,14 +212,18 @@ const ilion = ({
   });
 
   const drawSource = new VectorSource();
+  const transparencyColorLayer = transparencyRandColor(transparency);
+  const colorLayer = randColor(color);
+
   const vector = new VectorLayer({
+    
     source: drawSource,
     style: new Style({
       fill: new Fill({
-        color: 'rgba(255, 255, 255, 0.2)',
+        color: transparencyColorLayer,
       }),
       stroke: new Stroke({
-        color: '#ffcc33',
+        color: colorLayer,
         width: 2,
       }),
       image: new CircleStyle({
@@ -314,8 +319,8 @@ const ilion = ({
       const splitFileName = event.file.name.split('');
       const removeExtention = splitFileName.slice(0, indexOfExtention);
       const fileName = removeExtention.join('');
-      const colorLayer = randColor(color);
-      const transparencyColorLayer = transparencyRandColor(transparency);
+      // const colorLayer = randColor(color);
+      // const transparencyColorLayer = transparencyRandColor(transparency);
       let fileColor;
       let test;
       event.features.forEach((feature) => {
@@ -465,18 +470,18 @@ const ilion = ({
               setEdit(true);
             });
             map.addInteraction(draw);
-            snap = new Snap();
-            map.addInteraction(snap);
+            // snap = new Snap();
+            // map.addInteraction(snap);
           }
           else if (event.data[0] === 'escape') {
             setCreate(false);
             tooltip.setPosition(undefined);
-            draw.finishDrawing();
+            draw && draw.finishDrawing();
             draw = undefined;
           }
         };
         map.removeInteraction(draw);
-        map.removeInteraction(snap);
+        // map.removeInteraction(snap);
         map.removeInteraction(modify);
         addInteractions();
       }
@@ -574,6 +579,9 @@ const ilion = ({
       }
     };
   }, []);
+  useEffect(() => {
+    
+  }, [])
 
   return (
     <>
@@ -597,7 +605,7 @@ const ilion = ({
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" noWrap>
+            <Typography variant="h6" noWrap onClick={initiateAxios}>
               Odyssée
             </Typography>
           </Toolbar>
@@ -625,7 +633,7 @@ const ilion = ({
             </IconButton>
           </div>
           <Divider />
-          <Menu layers={layersActive} drawerState={open} />
+          <Menu layers={layersActive} drawerState={open} changeDrawerState={setOpen} />
         </Drawer>
       </div>
 

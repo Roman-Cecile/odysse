@@ -92,7 +92,7 @@ const App = ({
               <ul>
                 {featuresSelected
                   ? featuresSelected.map((featureName) => (
-                    <li className={classes.paperStyleLi}>
+                    <li key={featureName} className={classes.paperStyleLi}>
                       {featureName}
                       <ClearIcon
                         fontSize="small"

@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect } from 'react';
 
 // Import Material UI
 import {
@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const MenuFeatures = ({layers, drawerState}) => {
+const MenuFeatures = ({layers, drawerState, changeDrawerState}) => {
   const [open, setOpen] = React.useState(false);
 
   const handleClick = () => {
@@ -71,7 +71,13 @@ const MenuFeatures = ({layers, drawerState}) => {
           badgeContent={layers.length}
           variant="dot"
         >
-          <LayersIcon color="primary" fontSize="large" />
+          <LayersIcon
+            color="primary"
+            fontSize="large"
+            onClick={() => {
+                changeDrawerState(!drawerState);
+            }}
+          />
         </Badge>),
       name: 'Open Layers',
       content: <div className={classes.layerPaper}><LayerPaper /></div>,
@@ -82,6 +88,8 @@ const MenuFeatures = ({layers, drawerState}) => {
       content: buttonsFeature.map((button) => button.type),
     },
   ];
+
+  
 
   return (
     <>
