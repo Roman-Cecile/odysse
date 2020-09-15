@@ -52,13 +52,16 @@ const ImportedLayer = ({
   const [open, setOpen] = React.useState(false);
   const [isVisible, setIsvisible] = React.useState(true);
   const [targetColor, setTargetColor] = React.useState(null);
+  const [targetLayer, setTargetLayer] = React.useState(null);
   const handleClick = (target) => {
     setTargetColor(target);
     setOpen(!open);
   };
-  function rgbToHex(r, g, b) {
-    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  const handleNamebyClick =(layerName) => {
+    setTargetLayer(layerName)
+    console.log(layerName);
   }
+
   return (
     <>
       <p className={classes.title}>
@@ -98,11 +101,14 @@ const ImportedLayer = ({
                 </div>
               </div>
               <div className={classes.icons}>
-                {isVisible
+                {targetLayer === layer.name && isVisible
                   ? (
                     <VisibilityIcon
                     style={{ cursor: 'pointer' }}
-                    onClick={() => {
+                    onClick={(event) => {
+                      console.log(event);
+                      event.name = layer.name
+                      handleNamebyClick(event.name)
                       window.postMessage(['toggleVisible', layer]);
                       setIsvisible(false);
                     }}

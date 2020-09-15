@@ -31,14 +31,16 @@ import {
   Typography,
   CssBaseline,
   Divider,
+  Snackbar,
 } from '@material-ui/core';
 import {
   Menu as MenuIcon,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
-  Delete,
+  Clear as ClearIcon,
 } from '@material-ui/icons';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
+import MuiAlert from '@material-ui/lab/Alert';
 
 // == Import component
 import LineString from 'ol/geom/LineString';
@@ -137,6 +139,10 @@ const useStyles = makeStyles((theme) => ({
     height: 40,
     zIndex: 1600,
   },
+  alert: {
+    position: 'fixed',
+    zIndex: 5000,
+  }
 }));
 
 // == Composant
@@ -167,6 +173,13 @@ const ilion = ({
     1849198.2873332978,
     6657654.787398941,
   ]);
+  const [alert, setAlert] = React.useState(false);
+  const closeAlert = () => {
+    setAlert(false)
+  }
+  function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+  }
 
   let draw;
   let snap;
@@ -311,7 +324,9 @@ const ilion = ({
   // instantiate DragAndDrop
   useEffect(() => {
     dragAndDropInteraction.on('addfeatures', (event) => {
-      const vectorSource = new VectorSource({
+      if (event.file.size <= 30000000) {
+
+        const vectorSource = new VectorSource({
         features: event.features,
       });
       // vectorSource.addFeatures(event.features);
@@ -380,7 +395,12 @@ const ilion = ({
       handleLayers(fileName, vectorSource.getExtent(), goodColor);
       handleImportedLayers(fileName, vectorSource.getExtent(), goodColor, isMultiPolygon);
       map.getView().fit(vectorSource.getExtent());
+      }
+      else {
+        setAlert(true)
+      }
     });
+    
   }, []);
 
   // instantiate overlay
@@ -636,6 +656,10 @@ const ilion = ({
           <Menu layers={layersActive} drawerState={open} changeDrawerState={setOpen} />
         </Drawer>
       </div>
+      
+        <Snackbar className={classes.alert} open={alert} autoHideDuration={5000} onClose={closeAlert}>
+          <Alert  severity="warning">Le fichier ne doit pas dépasser 30Mo</Alert>
+        </Snackbar>
 
       <div
         id="map"

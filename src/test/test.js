@@ -98,32 +98,37 @@ describe('featureReducer', () => {
   });
   it("should handle HANDLE_ONE_FEATURE_PROPERTIES", () => {
     expect(
-      reducer(undefined, {
+      reducer({oneFeatureProperties: {
+        STATUT: "A"
+      }}, {
         type: HANDLE_ONE_FEATURE_PROPERTIES,
         properties: {STATUT: "E"}
       })
     ).toEqual(
       {
-        features: [],
         oneFeatureProperties: {
           STATUT: "E"
         }
       }
     )
   });
-  // it("should handle HANDLE_CHANGE", () => {
-  //   expect(
-  //     reducer(undefined, {
-  //       type: HANDLE_CHANGE,
-  //       value: "C",
-  //       name: "STATUT"
-  //     })
-  //   ).toEqual(
-  //     {
-  //       features: [],
-  //     }
-  //   )
-  // });
+  it("should handle HANDLE_CHANGE", () => {
+    expect(
+      reducer({oneFeatureProperties: {
+        STATUT: "A"
+      }}, {
+        type: HANDLE_CHANGE,
+        value: "C",
+        name: "STATUT"
+      })
+    ).toEqual(
+      {
+        oneFeatureProperties: {
+          STATUT: "C"
+        }
+      }
+    )
+  });
   it("should handle DELETE_ALL_FEATURES", () => {
     expect(
       reducer(undefined, {
